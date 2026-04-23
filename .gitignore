@@ -205,3 +205,26 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- Custom Additions for ColdChain-AI ---
+
+# Node/React dependencies
+node_modules/
+build/
+dist/
+
+# Firebase configuration & logs
+.firebase/
+firebase-debug.log*
+firestore.debug.log*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Ensure environment variables are hidden
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
