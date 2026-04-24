@@ -59,8 +59,8 @@ def simulate_data(db):
             
             print(f"[{datetime.datetime.now()}] Sent: Temp={temperature}°C, Lat={latitude}, Lon={longitude}")
             
-            # Wait for 5 seconds
-            time.sleep(5)
+            # Wait for 15 seconds
+            time.sleep(15)
             
     except KeyboardInterrupt:
         print("\nSimulation stopped by user.")
