@@ -36,8 +36,8 @@ def simulate_data(db):
     
     try:
         while True:
-            # Generate dummy temperature (5°C to 10°C)
-            temperature = round(random.uniform(5.0, 10.0), 2)
+            # Generate dummy temperature (7°C to 12°C) - increased range to trigger alerts more often
+            temperature = round(random.uniform(7.0, 12.0), 2)
             
             # Generate dummy GPS data (near a central point, e.g., Bangalore)
             latitude = round(12.9716 + random.uniform(-0.01, 0.01), 6)

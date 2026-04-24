@@ -7,10 +7,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_MAPS_API_KEY;
 
-// NEW CONFIG: Fresh API Key from Google AI Studio
-// NEW CONFIG: API Key loaded inside getAiAdvice
-
-
+// NEW CONFIG: Google Gemini API Key
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 const mapContainerStyle = { width: '100%', height: '100%' };
 const mapOptions = {
@@ -30,8 +30,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [aiResponse, setAiResponse] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
-  // Persist lock in sessionStorage to survive page reloads and HMR
-  const hasRequestedAdviceRef = useRef(sessionStorage.getItem('advisoryActive') === 'true');
+  const advisoryGeneratedRef = useRef(false);
+  const lastApiCallTimeRef = useRef(0); // Timestamp of last API call
+  const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -60,22 +61,21 @@ const Dashboard = () => {
     const temp = latestLog.temperature;
     console.log(`Current Temp: ${temp}°C`);
 
+    const now = Date.now();
     if (temp > 8.0) {
-      if (!hasRequestedAdviceRef.current) {
-        console.log("DEBUG: Logic Gate Passed, calling API");
-        hasRequestedAdviceRef.current = true;
-        sessionStorage.setItem('advisoryActive', 'true');
+      if (!advisoryGeneratedRef.current && (now - lastApiCallTimeRef.current) > COOLDOWN_MS) {
+        console.log("Triggering Gemini API...");
         getAiAdvice(latestLog);
+        advisoryGeneratedRef.current = true;
+        lastApiCallTimeRef.current = now;
+      } else if ((now - lastApiCallTimeRef.current) <= COOLDOWN_MS) {
+        console.log("API call on cooldown. Skipping.");
       }
     } else {
-      if (hasRequestedAdviceRef.current) {
-        console.log("Temp safe. Clearing advisory.");
-        setAiResponse("System Monitoring: All clear. Vaccine temperature is within safe limits (2°C - 8°C).");
-        hasRequestedAdviceRef.current = false;
-        sessionStorage.setItem('advisoryActive', 'false');
-      } else if (!aiResponse) {
-        setAiResponse("System Monitoring: All clear. Vaccine temperature is within safe limits (2°C - 8°C).");
-      }
+      console.log("Temp safe. Clearing advisory.");
+      setAiResponse("System Monitoring: All clear. Vaccine temperature is within safe limits (2°C - 8°C).");
+      advisoryGeneratedRef.current = false;
+    }
     }
   }, [latestLog]); // Keep dependency array minimal to avoid loops
 
