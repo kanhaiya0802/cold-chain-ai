@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { Thermometer, MapPin, Activity, AlertTriangle, CheckCircle, Navigation, Brain, Zap, ShieldAlert, Info } from 'lucide-react';
-import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, MarkerF, CircleF } from '@react-google-maps/api';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_MAPS_API_KEY;
@@ -30,6 +30,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [aiResponse, setAiResponse] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isDataFresh, setIsDataFresh] = useState(true);
   // Persist lock in sessionStorage to survive page reloads and HMR
   const hasRequestedAdviceRef = useRef(sessionStorage.getItem('advisoryActive') === 'true');
 
@@ -52,6 +53,26 @@ const Dashboard = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  // Monitor data freshness (last 30 seconds)
+  useEffect(() => {
+    const checkFreshness = () => {
+      if (!latestLog?.timestamp) return;
+      let logTime;
+      if (typeof latestLog.timestamp.toMillis === 'function') {
+        logTime = latestLog.timestamp.toMillis();
+      } else if (latestLog.timestamp.seconds) {
+        logTime = latestLog.timestamp.seconds * 1000;
+      } else {
+        logTime = Date.now();
+      }
+      setIsDataFresh(Date.now() - logTime <= 30000);
+    };
+    
+    checkFreshness();
+    const interval = setInterval(checkFreshness, 5000);
+    return () => clearInterval(interval);
+  }, [latestLog]);
 
   // AI Trigger Logic
   useEffect(() => {
@@ -113,6 +134,13 @@ const Dashboard = () => {
 
   const getAiAdvice = async (data) => {
     if (isAiLoading) return;
+    
+    // Gatekeeper: Validate required data points before proceeding
+    if (data?.temperature === undefined || data?.location?.latitude === undefined || data?.location?.longitude === undefined) {
+      console.warn("Gatekeeper: Missing required data points. Silent exit.");
+      return;
+    }
+
     setIsAiLoading(true);
     setAiResponse("Generating emergency plan...");
     
@@ -125,8 +153,7 @@ const Dashboard = () => {
     console.log("Calling Gemini with v1beta...");
 
     try {
-      const lat = data.location.latitude;
-      const lng = data.location.longitude;
+      const { latitude: lat, longitude: lng } = data.location;
       const temp = data.temperature;
 
       const result = await model.generateContent(`Truck at ${lat}, ${lng} is at ${temp}°C. The temperature is critical. Please provide a brief emergency plan and suggest 3 nearest hospitals. Format the hospitals as a clear bulleted list.`);
@@ -142,6 +169,22 @@ const Dashboard = () => {
     }
   };
 
+  const isWarning = latestLog?.temperature > 8.0;
+  const position = latestLog ? { lat: latestLog.location.latitude, lng: latestLog.location.longitude } : { lat: 12.9716, lng: 77.5946 };
+
+  // Generate mock safe zones around the truck when AI response is ready
+  const mockHospitals = React.useMemo(() => {
+    if (!isWarning || !aiResponse) return [];
+    const baseLat = position.lat;
+    const baseLng = position.lng;
+    return [
+      { lat: baseLat + 0.02, lng: baseLng + 0.03 },
+      { lat: baseLat - 0.03, lng: baseLng + 0.01 },
+      { lat: baseLat + 0.01, lng: baseLng - 0.035 }
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWarning, aiResponse]); // Intentionally omitting position to keep circles static once generated
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -149,9 +192,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  const isWarning = latestLog?.temperature > 8.0;
-  const position = latestLog ? { lat: latestLog.location.latitude, lng: latestLog.location.longitude } : { lat: 12.9716, lng: 77.5946 };
 
   return (
     <div className="p-6 space-y-6">
@@ -173,7 +213,19 @@ const Dashboard = () => {
       {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard icon={<Thermometer className={isWarning ? 'text-red-400' : 'text-blue-400'} size={24} />} label="Temperature" value={latestLog ? `${latestLog.temperature.toFixed(1)}°C` : '--'} subValue="/ 8°C max" isWarning={isWarning} tag="LIVE" accentColor={isWarning ? "red" : "blue"} />
-        <StatCard icon={<Activity className="text-purple-400" size={24} />} label="Sensor Health" value={latestLog?.status || 'Active'} isWarning={isWarning} tag="IOT" accentColor="purple" />
+        <StatCard 
+          icon={<Activity className="text-purple-400" size={24} />} 
+          label="Sensor Health" 
+          value={latestLog?.status || 'Active'} 
+          isWarning={isWarning} 
+          tag="IOT" 
+          accentColor="purple"
+          statusIndicator={
+            <div className="flex items-center justify-center w-4 h-4" title={isDataFresh ? "Real-time connection active" : "Connection lagging"}>
+              <div className={`w-3 h-3 rounded-full ${isDataFresh ? 'bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]'}`}></div>
+            </div>
+          }
+        />
         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 lg:col-span-2 shadow-lg shadow-black/20">
           <div className="flex items-center justify-between mb-4"><div className="p-3 bg-indigo-500/10 rounded-xl"><MapPin className="text-indigo-400" size={24} /></div><span className="text-[10px] font-mono text-slate-500 bg-slate-900 px-2 py-1 rounded">GPS</span></div>
           <h3 className="text-slate-400 text-sm font-medium">Coordinates</h3>
@@ -189,8 +241,26 @@ const Dashboard = () => {
           <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
             <div className="flex items-center gap-2"><div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div><h3 className="font-semibold text-slate-300 text-sm">Live GPS Tracking</h3></div>
           </div>
-          <div className="flex-1">
-            {isLoaded ? <GoogleMap mapContainerStyle={mapContainerStyle} center={position} zoom={15} options={mapOptions}><MarkerF position={position} icon={{ url: 'https://maps.google.com/mapfiles/ms/icons/truck.png', scaledSize: new window.google.maps.Size(40, 40) }} /></GoogleMap> : <div className="h-full bg-slate-900 animate-pulse"></div>}
+          <div className="flex-1 relative">
+            {isLoaded ? (
+              <GoogleMap mapContainerStyle={mapContainerStyle} center={position} zoom={isWarning && mockHospitals.length > 0 ? 11 : 15} options={mapOptions}>
+                <MarkerF position={position} icon={{ url: 'https://maps.google.com/mapfiles/ms/icons/truck.png', scaledSize: new window.google.maps.Size(40, 40) }} />
+                {mockHospitals.map((hosp, i) => (
+                  <CircleF
+                    key={i}
+                    center={hosp}
+                    radius={3000} // ~3km radius
+                    options={{
+                      fillColor: '#22c55e',
+                      fillOpacity: 0.2,
+                      strokeColor: '#22c55e',
+                      strokeOpacity: 0.8,
+                      strokeWeight: 2,
+                    }}
+                  />
+                ))}
+              </GoogleMap>
+            ) : <div className="h-full bg-slate-900 animate-pulse"></div>}
           </div>
         </div>
 
@@ -199,7 +269,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2"><Brain className={isWarning ? 'text-red-400' : 'text-blue-400'} size={20} /><h3 className="font-bold text-sm tracking-wide uppercase">AI Emergency Advisory</h3></div>
             {isAiLoading && <Zap className="text-yellow-400 animate-bounce" size={18} />}
           </div>
-          <div className={`flex-1 p-5 overflow-y-auto max-h-[450px] transition-opacity duration-300 ${isAiLoading ? 'opacity-50' : 'opacity-100'}`}>
+          <div className={`flex-1 p-5 pb-8 h-auto transition-opacity duration-300 ${isAiLoading ? 'opacity-50' : 'opacity-100'}`}>
             <div className="prose prose-invert prose-sm max-w-none">
               {isWarning ? (
                 <div className="space-y-4">
@@ -221,13 +291,16 @@ const Dashboard = () => {
   );
 };
 
-const StatCard = ({ icon, label, value, subValue, tag, accentColor }) => {
+const StatCard = ({ icon, label, value, subValue, tag, accentColor, statusIndicator }) => {
   const colors = { blue: "border-blue-500/30 hover:border-blue-500/60", red: "border-red-500/30 hover:border-red-500/60", purple: "border-purple-500/30 hover:border-purple-500/60" };
   return (
     <div className={`bg-slate-800 rounded-2xl p-6 border transition-all shadow-lg shadow-black/20 ${colors[accentColor]}`}>
       <div className="flex items-center justify-between mb-4"><div className={`p-3 rounded-xl bg-${accentColor}-500/10`}>{icon}</div><span className="text-[10px] font-mono text-slate-500 bg-slate-900 px-2 py-1 rounded">{tag}</span></div>
       <h3 className="text-slate-400 text-sm font-medium">{label}</h3>
-      <div className="flex items-baseline gap-2 mt-2"><span className="text-4xl font-bold text-white">{value}</span>{subValue && <span className="text-slate-500 text-sm">{subValue}</span>}</div>
+      <div className="flex items-center gap-3 mt-2">
+        {statusIndicator}
+        <div className="flex items-baseline gap-2"><span className="text-4xl font-bold text-white">{value}</span>{subValue && <span className="text-slate-500 text-sm">{subValue}</span>}</div>
+      </div>
     </div>
   );
 };
