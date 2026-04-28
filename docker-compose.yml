@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  # Nginx API Gateway / Reverse Proxy
+  proxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: cold-chain-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - cold-chain-network
+
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
