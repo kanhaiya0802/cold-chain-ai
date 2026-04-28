@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: cold-chain-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_DB: cold_chain_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cold-chain-network
+
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: ./api_server
+      dockerfile: Dockerfile
+    container_name: cold-chain-api
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-password123}@db:5432/cold_chain_ai
+      JWT_SECRET: ${JWT_SECRET:-your-secret-jwt-key-change-this}
+      ENVIRONMENT: development
+      LOG_LEVEL: info
+      ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api_server:/app
+    networks:
+      - cold-chain-network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: ./client_web_app
+      dockerfile: Dockerfile
+    container_name: cold-chain-web
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - cold-chain-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  cold-chain-network:
+    driver: bridge

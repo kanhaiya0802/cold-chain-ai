@@ -30,15 +30,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [aiResponse, setAiResponse] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
-<<<<<<< HEAD
-  const [isDataFresh, setIsDataFresh] = useState(true);
-  // Persist lock in sessionStorage to survive page reloads and HMR
-  const hasRequestedAdviceRef = useRef(sessionStorage.getItem('advisoryActive') === 'true');
-=======
   const advisoryGeneratedRef = useRef(false);
   const lastApiCallTimeRef = useRef(0); // Timestamp of last API call
   const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown
->>>>>>> 7b1fa3e92a8e358ca0f1b7cdc8fc6520be6a71b0
+
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
