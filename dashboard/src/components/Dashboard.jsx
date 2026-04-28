@@ -76,8 +76,7 @@ const Dashboard = () => {
       setAiResponse("System Monitoring: All clear. Vaccine temperature is within safe limits (2°C - 8°C).");
       advisoryGeneratedRef.current = false;
     }
-    }
-  }, [latestLog]); // Keep dependency array minimal to avoid loops
+  },[latestLog]); // Keep dependency array minimal to avoid loops
 
   const formatAiResponse = (text) => {
     if (!text) return null;
@@ -221,11 +220,25 @@ const Dashboard = () => {
   );
 };
 
+const getAccentClasses = (accentColor) => {
+  const bgClasses = {
+    blue: 'bg-blue-500/10',
+    red: 'bg-red-500/10',
+    purple: 'bg-purple-500/10'
+  };
+  const borderClasses = {
+    blue: 'border-blue-500/30 hover:border-blue-500/60',
+    red: 'border-red-500/30 hover:border-red-500/60',
+    purple: 'border-purple-500/30 hover:border-purple-500/60'
+  };
+  return { bg: bgClasses[accentColor] || bgClasses.blue, border: borderClasses[accentColor] || borderClasses.blue };
+};
+
 const StatCard = ({ icon, label, value, subValue, tag, accentColor }) => {
-  const colors = { blue: "border-blue-500/30 hover:border-blue-500/60", red: "border-red-500/30 hover:border-red-500/60", purple: "border-purple-500/30 hover:border-purple-500/60" };
+  const { bg, border } = getAccentClasses(accentColor);
   return (
-    <div className={`bg-slate-800 rounded-2xl p-6 border transition-all shadow-lg shadow-black/20 ${colors[accentColor]}`}>
-      <div className="flex items-center justify-between mb-4"><div className={`p-3 rounded-xl bg-${accentColor}-500/10`}>{icon}</div><span className="text-[10px] font-mono text-slate-500 bg-slate-900 px-2 py-1 rounded">{tag}</span></div>
+    <div className={`bg-slate-800 rounded-2xl p-6 border transition-all shadow-lg shadow-black/20 ${border}`}>
+      <div className="flex items-center justify-between mb-4"><div className={`p-3 rounded-xl ${bg}`}>{icon}</div><span className="text-[10px] font-mono text-slate-500 bg-slate-900 px-2 py-1 rounded">{tag}</span></div>
       <h3 className="text-slate-400 text-sm font-medium">{label}</h3>
       <div className="flex items-baseline gap-2 mt-2"><span className="text-4xl font-bold text-white">{value}</span>{subValue && <span className="text-slate-500 text-sm">{subValue}</span>}</div>
     </div>
