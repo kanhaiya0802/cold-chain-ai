@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+websockets
+python-dotenv
+google-generativeai
+passlib[bcrypt]
+pyjwt
+python-multipart
