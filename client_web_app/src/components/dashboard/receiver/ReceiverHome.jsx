@@ -34,7 +34,7 @@ const ReceiverHome = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/stats', {
+        const res = await fetch('/api/receiver/stats', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setStats(await res.json());
@@ -48,14 +48,14 @@ const ReceiverHome = () => {
 
     const fetchActiveShipment = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/orders', {
+        const res = await fetch('/api/receiver/orders', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
           const orders = await res.json();
           const inTransit = orders.find(o => o.status === 'dispatched' || o.status === 'in_transit');
           if (inTransit) {
-            const trackRes = await fetch(`http://127.0.0.1:8000/receiver/orders/${inTransit.order_id}/tracking`, {
+            const trackRes = await fetch(`/api/receiver/orders/${inTransit.order_id}/tracking`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (trackRes.ok) setActiveShipment(await trackRes.json());

@@ -17,7 +17,7 @@ const MyOrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/orders', {
+        const res = await fetch('/api/receiver/orders', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setOrders(await res.json());

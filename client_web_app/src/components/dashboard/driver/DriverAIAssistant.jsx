@@ -26,7 +26,7 @@ const DriverAIAssistant = () => {
 
     try {
       // For demo, we simulate a very helpful AI response tailored to drivers
-      const response = await fetch('http://127.0.0.1:8000/agent/chat', {
+      const response = await fetch('/api/agent/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

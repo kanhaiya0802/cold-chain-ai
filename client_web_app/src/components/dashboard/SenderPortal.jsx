@@ -18,9 +18,9 @@ const SenderPortal = () => {
     const fetchData = async () => {
       try {
         const [invRes, ordRes, shipRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/inventory', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://127.0.0.1:8000/orders', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://127.0.0.1:8000/shipments', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('/api/inventory', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('/api/orders', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('/api/shipments', { headers: { 'Authorization': `Bearer ${token}` } }),
         ]);
         if (invRes.ok) setInventory(await invRes.json());
         if (ordRes.ok) setOrders(await ordRes.json());

@@ -13,7 +13,7 @@ const ReportsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/reports/daily`, {
+      const res = await fetch(`/api/reports/daily`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error("Backend error. Please ensure your Gemini API key is valid in the .env file.");

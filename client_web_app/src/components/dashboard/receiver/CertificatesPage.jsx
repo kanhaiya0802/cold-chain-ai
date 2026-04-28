@@ -13,7 +13,7 @@ const CertificatesPage = () => {
   useEffect(() => {
     const fetchProofs = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/proofs', {
+        const res = await fetch('/api/receiver/proofs', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setProofs(await res.json());

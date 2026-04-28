@@ -11,7 +11,7 @@ const InventoryPage = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/inventory`, {
+        const res = await fetch(`/api/inventory`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

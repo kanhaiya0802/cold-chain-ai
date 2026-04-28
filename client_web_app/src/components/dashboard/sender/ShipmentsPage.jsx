@@ -10,7 +10,7 @@ const ShipmentsPage = () => {
   useEffect(() => {
     const fetchShipments = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/shipments`, {
+        const res = await fetch(`/api/shipments`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

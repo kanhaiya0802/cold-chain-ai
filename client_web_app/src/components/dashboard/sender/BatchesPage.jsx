@@ -10,7 +10,7 @@ const BatchesPage = () => {
   useEffect(() => {
     const fetchBatches = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/batches`, {
+        const res = await fetch(`/api/batches`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

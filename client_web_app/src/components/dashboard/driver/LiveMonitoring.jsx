@@ -33,13 +33,13 @@ const LiveMonitoring = () => {
   useEffect(() => {
     const fetchLive = async () => {
       try {
-        const shipRes = await fetch('http://127.0.0.1:8000/transport/shipments', {
+        const shipRes = await fetch('/api/transport/shipments', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (shipRes.ok) {
            const shipments = await shipRes.json();
            if (shipments.length > 0) {
-              const res = await fetch(`http://127.0.0.1:8000/transport/live-monitoring/${shipments[0].shipment_id}`, {
+              const res = await fetch(`/api/transport/live-monitoring/${shipments[0].shipment_id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
               if (res.ok) setData(await res.json());

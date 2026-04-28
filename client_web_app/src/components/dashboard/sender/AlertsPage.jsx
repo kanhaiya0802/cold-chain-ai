@@ -10,7 +10,7 @@ const AlertsPage = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/alerts`, {
+        const res = await fetch(`/api/alerts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

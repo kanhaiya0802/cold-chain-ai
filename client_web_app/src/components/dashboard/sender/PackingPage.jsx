@@ -11,7 +11,7 @@ const PackingPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/orders?token=${token}`);
+      const res = await fetch(`/api/orders?token=${token}`);
       if (res.ok) {
         const data = await res.json();
         // Only show confirmed orders (ready to pack) or recently packed
@@ -31,7 +31,7 @@ const PackingPage = () => {
   const handlePack = async (orderId) => {
     setPackingId(orderId);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/orders/${orderId}/pack?token=${token}`, {
+      const res = await fetch(`/api/orders/${orderId}/pack?token=${token}`, {
         method: 'POST'
       });
       if (res.ok) {

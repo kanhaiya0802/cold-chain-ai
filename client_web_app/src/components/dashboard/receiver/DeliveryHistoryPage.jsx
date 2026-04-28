@@ -13,7 +13,7 @@ const DeliveryHistoryPage = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/history', {
+        const res = await fetch('/api/receiver/history', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setHistory(await res.json());

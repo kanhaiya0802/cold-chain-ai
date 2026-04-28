@@ -20,7 +20,8 @@ const useWebSocket = (token) => {
     }
 
     console.log('[WS] Connecting...');
-    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${token}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws/${token}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

@@ -16,7 +16,7 @@ const SupportPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/receiver/complaints', {
+      const res = await fetch('/api/receiver/complaints', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

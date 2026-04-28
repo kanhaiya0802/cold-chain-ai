@@ -164,7 +164,7 @@ const AgentPanel = ({ onClose }) => {
     setStartTime(Date.now());
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/agent/run', {
+      const res = await fetch('/api/agent/run', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

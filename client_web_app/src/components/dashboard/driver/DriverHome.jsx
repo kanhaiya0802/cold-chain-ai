@@ -33,7 +33,7 @@ const DriverHome = () => {
 
   const fetchShipments = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/transport/shipments', {
+      const res = await fetch('/api/transport/shipments', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {

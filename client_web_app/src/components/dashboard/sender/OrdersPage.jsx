@@ -10,7 +10,7 @@ const OrdersPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/orders?token=${token}`);
+      const res = await fetch(`/api/orders?token=${token}`);
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -29,7 +29,7 @@ const OrdersPage = () => {
   const handleApprove = async (orderId) => {
     setApproving(orderId);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/orders/${orderId}/approve?token=${token}`, {
+      const res = await fetch(`/api/orders/${orderId}/approve?token=${token}`, {
         method: 'POST'
       });
       if (res.ok) {
@@ -52,7 +52,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchTrucks = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/trucks?token=${token}`);
+        const res = await fetch(`/api/trucks?token=${token}`);
         if (res.ok) setTrucks(await res.json());
       } catch (err) { console.error(err); }
     };
@@ -64,7 +64,7 @@ const OrdersPage = () => {
     if (!truckId) return alert("Select a truck first");
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/shipments?token=${token}`, {
+      const res = await fetch(`/api/shipments?token=${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ truck_id: parseInt(truckId), sender_id: 1 }) // Mock sender_id for now

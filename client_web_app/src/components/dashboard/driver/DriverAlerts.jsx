@@ -14,7 +14,7 @@ const DriverAlerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/transport/alerts', {
+        const res = await fetch('/api/transport/alerts', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setAlerts(await res.json());

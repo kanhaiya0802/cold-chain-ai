@@ -21,7 +21,7 @@ const ReceiverTrackingPage = () => {
       const fetchTracking = async () => {
         setLoading(true);
         try {
-          const res = await fetch(`http://127.0.0.1:8000/receiver/orders/${orderId}/tracking`, {
+          const res = await fetch(`/api/receiver/orders/${orderId}/tracking`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) setTrackingData(await res.json());

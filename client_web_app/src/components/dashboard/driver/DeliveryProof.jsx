@@ -24,7 +24,7 @@ const DeliveryProof = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/transport/confirm-delivery', {
+      const res = await fetch('/api/transport/confirm-delivery', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

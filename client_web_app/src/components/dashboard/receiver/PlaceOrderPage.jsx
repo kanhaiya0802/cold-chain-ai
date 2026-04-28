@@ -20,7 +20,7 @@ const PlaceOrderPage = () => {
   useEffect(() => {
     const fetchSenders = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/receiver/senders', {
+        const res = await fetch('/api/receiver/senders', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -38,7 +38,7 @@ const PlaceOrderPage = () => {
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/inventory', {
+        const res = await fetch('/api/inventory', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) setCatalog(await res.json());
@@ -73,7 +73,7 @@ const PlaceOrderPage = () => {
     
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/receiver/orders', {
+      const res = await fetch('/api/receiver/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

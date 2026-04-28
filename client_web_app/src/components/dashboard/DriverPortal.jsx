@@ -12,8 +12,8 @@ const DriverPortal = () => {
     const fetchData = async () => {
       try {
         const [shipRes, alertRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/shipments', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://127.0.0.1:8000/alerts', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch('/api/shipments', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('/api/alerts', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
 
         if (shipRes.ok) setShipments(await shipRes.json());

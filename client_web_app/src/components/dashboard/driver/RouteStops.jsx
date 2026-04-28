@@ -15,13 +15,13 @@ const RouteStops = () => {
     // For demo, we just fetch stops for the first assigned shipment
     const fetchStops = async () => {
       try {
-        const shipRes = await fetch('http://127.0.0.1:8000/transport/shipments', {
+        const shipRes = await fetch('/api/transport/shipments', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (shipRes.ok) {
            const shipments = await shipRes.json();
            if (shipments.length > 0) {
-              const stopRes = await fetch(`http://127.0.0.1:8000/transport/shipments/${shipments[0].shipment_id}/stops`, {
+              const stopRes = await fetch(`/api/transport/shipments/${shipments[0].shipment_id}/stops`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
               if (stopRes.ok) setStops(await stopRes.json());
