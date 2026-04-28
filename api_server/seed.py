@@ -5,12 +5,21 @@ from core.auth import get_password_hash
 from datetime import datetime, timedelta, timezone
 import random
 
+import sys
+
 def seed_db():
+    db = SessionLocal()
+    
+    # If not forcing, check if data already exists
+    if "--force" not in sys.argv:
+        if db.query(models.User).first():
+            print("Database already populated. Skipping seed. (Run with --force to wipe and reseed)")
+            return
+
     print("Dropping existing tables and creating new schema...")
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    db = SessionLocal()
 
     # --- Users ---
     print("Seeding Users...")

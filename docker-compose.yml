@@ -56,7 +56,20 @@ services:
       - ./api_server:/app
     networks:
       - cold-chain-network
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: sh -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # Real-time Telemetry Simulator
+  simulator:
+    build:
+      context: ./data_simulator
+      dockerfile: Dockerfile
+    container_name: cold-chain-simulator
+    environment:
+      API_URL: http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - cold-chain-network
 
   # Frontend (React + Nginx)
   frontend:
