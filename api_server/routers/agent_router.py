@@ -38,7 +38,7 @@ AGENT_TOOLS = types.Tool(
                 "temperature, humidity, battery level, door status, and GPS coordinates. "
                 "Use this to understand the current state of the entire fleet."
             ),
-            parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+            parameters=types.Schema(type='OBJECT', properties={}),
         ),
         types.FunctionDeclaration(
             name="get_active_alerts",
@@ -46,7 +46,7 @@ AGENT_TOOLS = types.Tool(
                 "Fetches all currently active (unresolved) alerts in the system. "
                 "Returns alert type, severity, shipment ID, and message."
             ),
-            parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+            parameters=types.Schema(type='OBJECT', properties={}),
         ),
         types.FunctionDeclaration(
             name="get_shipment_summary",
@@ -54,7 +54,7 @@ AGENT_TOOLS = types.Tool(
                 "Returns a summary of all shipments including counts by status "
                 "(planned, in_transit, completed, issue), and pending orders count."
             ),
-            parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+            parameters=types.Schema(type='OBJECT', properties={}),
         ),
         types.FunctionDeclaration(
             name="calculate_risk_score",
@@ -64,10 +64,10 @@ AGENT_TOOLS = types.Tool(
                 "Score > 70 = Critical, 40-70 = Warning, < 40 = Safe."
             ),
             parameters=types.Schema(
-                type=types.Type.OBJECT,
+                type='OBJECT',
                 properties={
                     "truck_id": types.Schema(
-                        type=types.Type.INTEGER,
+                        type='INTEGER',
                         description="The ID of the truck to score."
                     )
                 },
@@ -81,22 +81,22 @@ AGENT_TOOLS = types.Tool(
                 "that hasn't been flagged yet. Use this proactively."
             ),
             parameters=types.Schema(
-                type=types.Type.OBJECT,
+                type='OBJECT',
                 properties={
                     "shipment_id": types.Schema(
-                        type=types.Type.INTEGER,
+                        type='INTEGER',
                         description="The shipment ID associated with this alert."
                     ),
                     "alert_type": types.Schema(
-                        type=types.Type.STRING,
+                        type='STRING',
                         description="Category of the alert: temperature, battery, door_open, route, or delay."
                     ),
                     "severity": types.Schema(
-                        type=types.Type.STRING,
+                        type='STRING',
                         description="Severity level: low, medium, high, or critical."
                     ),
                     "message": types.Schema(
-                        type=types.Type.STRING,
+                        type='STRING',
                         description="Detailed alert message for operators."
                     ),
                 },
@@ -110,10 +110,10 @@ AGENT_TOOLS = types.Tool(
                 "to identify warming or cooling trends."
             ),
             parameters=types.Schema(
-                type=types.Type.OBJECT,
+                type='OBJECT',
                 properties={
                     "shipment_id": types.Schema(
-                        type=types.Type.INTEGER,
+                        type='INTEGER',
                         description="The shipment ID to analyze temperature trends for."
                     )
                 },
