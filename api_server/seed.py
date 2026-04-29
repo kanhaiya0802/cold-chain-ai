@@ -10,15 +10,19 @@ import sys
 def seed_db():
     db = SessionLocal()
     
-    # If not forcing, check if data already exists
-    if "--force" not in sys.argv:
+    if "--force" in sys.argv:
+        print("Dropping existing tables and creating new schema...")
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+    else:
+        # Create tables if they don't exist
+        print("Ensuring database schema exists...")
+        Base.metadata.create_all(bind=engine)
+        
+        # Check if data already exists
         if db.query(models.User).first():
             print("Database already populated. Skipping seed. (Run with --force to wipe and reseed)")
             return
-
-    print("Dropping existing tables and creating new schema...")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
 
 
     # --- Users ---
