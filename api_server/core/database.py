@@ -6,7 +6,7 @@ import os
 # Use PostgreSQL from environment, fallback to SQLite for local development
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///./database/coldchain.db"
+    "sqlite:///./coldchain.db"
 )
 
 # For SQLite, use check_same_thread; for PostgreSQL, skip this parameter
