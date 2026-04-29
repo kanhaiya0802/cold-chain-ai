@@ -290,7 +290,7 @@ async def run_agent(db: Session = Depends(get_db)):
     Runs the Cold Chain Command Agent using Gemini function calling.
     Returns a Server-Sent Events (SSE) stream of the agent's steps.
     """
-    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key or api_key in ("YOUR_ACTUAL_GEMINI_API_KEY_HERE", "put_your_real_gemini_key_here", "your-gemini-api-key-here"):
         raise HTTPException(
             status_code=503,
